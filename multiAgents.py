@@ -224,7 +224,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 					nextState, a, b, pac_index + 1, depth))
 				if(value > b):
 					return value
-			a = max(a, value)
+				a = max(a, value)
 			return value
 
 		def minPlayer(gameState, a, b, ghost_index, depth):
@@ -234,38 +234,25 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 			# Store system.max integer.
 			value = sys.maxint
 			legalActions = gameState.getLegalActions(ghost_index)
-			for action in legalActions:
-				nextState = gameState.generateSuccessor(ghost_index, action)
-				if ghost_index == gameState.getNumAgents()-1:
-					value = min(value, maxPlayer(nextState, a, b, depth + 1))
-					if value < a:
+						# We need to check if we are at the last ghost.
+			if (ghost_index == gameState.getNumAgents()-1):
+				for action in legalActions:
+					nextState = gameState.generateSuccessor(ghost_index, action)
+					value = min(value, maxPlayer(nextState, a, b, depth-1))
+					if(value < a):
 						return value
-					b = min(b, value)
-				else:
-					value = min(value, minPlayer(nextState, a, b, ghost_index + 1, depth))
-					if value < a:
-						return value
-					b = min(b, value)
+					b = min(b,value)
+			else:
+				for action in legalActions:
+					nextState = gameState.generateSuccessor(ghost_index, action)
+					value = min(value, minPlayer(nextState,a,b,ghost_index+1,depth))
+					if(value < a):
+							return value
+					b = min(b,value)
 			return value
 
 		"""
-				# We need to check if we are at the last ghost.
-				if (ghost_index == gameState.getNumAgents()-1):
-						for action in legalActions:
-								nextState = gameState.generateSuccessor(ghost_index, action)
-								value = min(value, maxPlayer(nextState, a, b, depth-1))
-								if(value < a):
-										return value
-								b = min(b,value)
-				else:
-						for action in legalActions:
-								nextState = gameState.generateSuccessor(ghost_index, action)
-								value = min(value, minPlayer(nextState,a,b,ghost_index+1,depth))
-								if(value < a):
-										return value
-								b = min(b,value)
 
-				return value
 		"""
 		# Generate minmax tree of depth 2.
 		pac_index = 0
