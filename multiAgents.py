@@ -129,6 +129,33 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        #min max, have to define a function to get both values.
+        #print gameState.getLegalActions()
+        #print gameState.getNumAgents()
+        #Get legal actions to pacman.
+        legalActions = gameState.getLegalActions(0)
+
+        #nextState = gameState.generateSuccessor(0,legalActions[0])
+        
+
+        nextState = gameState.generateSuccessor(0, legalActions[0])
+        
+        #Number of ghosts
+        n_ghosts = gameState.getNumAgents()-1
+        print "nextState: " nextState 
+        #print n_ghosts, legalActions
+        #Generate minmax tree of depth 2.
+        for action in legalActions:
+              #Check which action is the best action with minmax algorithm
+
+              return action
+
+
+
+        #Agentindex, action
+        #gameState.generateSuccessor()
+              
+
         util.raiseNotDefined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
