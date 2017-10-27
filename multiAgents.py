@@ -220,9 +220,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 			for action in gameState.getLegalActions(pac_index):
 				# Get next state with this action from pacman's index.
 				nextState = gameState.generateSuccessor(pac_index, action)
+				# Get the max value of the next min layers.
 				value = max(value, minPlayer(
 					nextState, a, b, pac_index + 1, depth))
+				#Check if the value that is returner is smaller than the beta value
 				if(value > b):
+					#Return value now, because we know it is the best we can get.
 					return value
 				a = max(a, value)
 			return value
@@ -234,19 +237,24 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 			# Store system.max integer.
 			value = sys.maxint
 			legalActions = gameState.getLegalActions(ghost_index)
-						# We need to check if we are at the last ghost.
+				# We need to check if we are at the last ghost.
 			if (ghost_index == gameState.getNumAgents()-1):
 				for action in legalActions:
 					nextState = gameState.generateSuccessor(ghost_index, action)
+					#get value from next dept in the tree. Where next is a max.
 					value = min(value, maxPlayer(nextState, a, b, depth-1))
 					if(value < a):
+    					#Return value now, since we can't get a better value
 						return value
 					b = min(b,value)
 			else:
+				#if we are not at the last ghost(min layer), we got n-ghosts min layer
 				for action in legalActions:
 					nextState = gameState.generateSuccessor(ghost_index, action)
+					#Get next value from the next ghost in a min layer.
 					value = min(value, minPlayer(nextState,a,b,ghost_index+1,depth))
 					if(value < a):
+    						#Return value now, since we can't get a better value
 							return value
 					b = min(b,value)
 			return value
@@ -261,11 +269,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 		score = -sys.maxint - 1
 		a = -sys.maxint - 1
 		b = sys.maxint
-
+		#itterate tru every action pacman can do. Return the one with best value
 		for action in legalActions:
 			next_state = gameState.generateSuccessor(pac_index, action)
 			# Check which action is the best action with minmax algorithm
 			prev_score = score
+			#Get score of this action with the minimax alg above.
 			score = max(score, minPlayer(
 				next_state, a, b, pac_index + 1, self.depth))
 			if(score > prev_score):
