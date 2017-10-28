@@ -116,7 +116,6 @@ class MultiAgentSearchAgent(Agent):
 
 import sys
 
-
 class MinimaxAgent(MultiAgentSearchAgent):
 	"""
 									Your minimax agent (question 2)
@@ -150,8 +149,11 @@ class MinimaxAgent(MultiAgentSearchAgent):
 		"""
 		def maxPlayer(gameState, depth):
 			""" max function for pacman """
+			#CHeck if we are at the bottom of the tree(where we get a value), or we have encountered an winning or losing move.
 			if (gameState.isWin() or gameState.isLose() or depth == 0):
+    			#Return value the value of this move.
 				return self.evaluationFunction(gameState)
+			#Store a value as - infinite ( large value what we know will be overwritten)
 			value = -sys.maxint - 1
 
 			# Check for every action, from legelActions pacman(index 0)
@@ -162,7 +164,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
 			return value
 
 		def minPlayer(gameState, depth, ghost_index):
-			""" min function for ghost """
+			""" min function for ghosts """
 			if (gameState.isWin() or gameState.isLose() or depth == 0):
 				return self.evaluationFunction(gameState)
 			value = sys.maxint
@@ -170,32 +172,42 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
 			# We need to check if we are at the last ghost.
 			if (ghost_index == gameState.getNumAgents() - 1):
+    			#Check every action of this ghost.
 				for action in legalActions:
 					nextState = gameState.generateSuccessor(
 						ghost_index, action)
+					#recursivly check the next level in the tree (MaxPlayer in this case)
 					value = min(value, maxPlayer(nextState, depth - 1))
 			else:
 				for action in legalActions:
 					nextState = gameState.generateSuccessor(
 						ghost_index, action)
+					#Recursivly check the next level in the tree(Next is a Ghost layer)
 					value = min(value, minPlayer(
 						nextState, depth, ghost_index + 1))
 			return value
 
 		# Generate minmax tree of depth 2.
 		pac_index = 0
+		#Set bestAction to STOP, because we know this is allwasy a valid move. 
+		#Incase we cant find a better move with the miniMax tree, we will just stand still
 		bestAction = Directions.STOP
+		#Generate all the legal actions for pacman.
 		legalActions = gameState.getLegalActions(pac_index)
+		#set current score to a very small number, to be overwritten later.
 		score = -sys.maxint - 1
 
 		for action in legalActions:
 			next_state = gameState.generateSuccessor(pac_index, action)
 			# Check which action is the best action with minmax algorithm
 			prev_score = score
+			#Get a new score from the tree.
 			score = max(score, minPlayer(next_state, self.depth, 1))
-
+			#Check if the new score is better than the previous one, 
+			#if it is we change the bestAction to our current action itteration.
 			if(score > prev_score):
 				bestAction = action
+		#Return the best Action we got from checking every step in the minimax tree.
 		return bestAction
 
 		util.raiseNotDefined()
@@ -208,7 +220,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
 	def getAction(self, gameState):
 		"""
-										Returns the minimax action using self.depth and self.evaluationFunction
+			Returns the minimax action using self.depth and self.evaluationFunction
 		"""
 		def maxPlayer(gameState, a, b, depth):
 			""" max function for pacman """
@@ -223,7 +235,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 				# Get the max value of the next min layers.
 				value = max(value, minPlayer(
 					nextState, a, b, pac_index + 1, depth))
-				#Check if the value that is returner is smaller than the beta value
+				#Check if the value that is returned is smaller than the beta value
 				if(value > b):
 					#Return value now, because we know it is the best we can get.
 					return value
@@ -254,20 +266,25 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 					#Get next value from the next ghost in a min layer.
 					value = min(value, minPlayer(nextState,a,b,ghost_index+1,depth))
 					if(value < a):
-    						#Return value now, since we can't get a better value
-							return value
+    					#Return value now, since we can't get a better value
+						return value
 					b = min(b,value)
 			return value
 
 		"""
-
+			For the alpha-beta tree, alpha a is a ceiling value, whilst beta b is a floor value. 
+			We know we can atleast expect either an alpha value or a beta value, depending on our current layer.
+			We alwasy compare the current beta and alpha values with previous layers, if we encounter a value smaller than alpha,
+			or greater than beta, we know we don't have to check the rest of that tree.
 		"""
 		# Generate minmax tree of depth 2.
 		pac_index = 0
 		bestAction = Directions.STOP
 		legalActions = gameState.getLegalActions(pac_index)
 		score = -sys.maxint - 1
+		#Alpha init value
 		a = -sys.maxint - 1
+		#Beta init value
 		b = sys.maxint
 		#itterate tru every action pacman can do. Return the one with best value
 		for action in legalActions:
@@ -277,10 +294,12 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 			#Get score of this action with the minimax alg above.
 			score = max(score, minPlayer(
 				next_state, a, b, pac_index + 1, self.depth))
+			#Check our score from the tree generated from this action.
+			#And set new action if it is better than the pevious one.
 			if(score > prev_score):
 				bestAction = action
 			if(score >= b):
-				# if score is higher than beta, we can stop.
+				# if score is higher than beta, we can stop. Because know it will never get any lower than beta b.
 				return bestAction
 			# Update alpha
 			a = max(a, score)
